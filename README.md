@@ -11,6 +11,9 @@
 
 | Tool 名稱                 | 功能說明     | 負責組員 |
 | ------------------------- | ------------ | -------- |
+| `web_search_tool` | 搜尋技術文件 |  林伽紜        |
+|                           |              |          |
+|                           |              |          |
 | （範例：`get_weather`） | 查詢即時天氣 |          |
 | `get_cat_fact_data`       | 休息時間冷知識 |     姚谷伝     |
 |`get_advice_tool`| bug 修不好時的心靈雞湯|    許瀞云      |
@@ -21,6 +24,7 @@
 
 | 姓名 | 負責功能            | 檔案          | 使用的 API |
 | ---- | ------------------- | ------------- | ---------- |
+| 林伽紜     |  搜尋技術文件   | `tools/web_search_tool.py`    | duckduckgo-search |
 | 許瀞云| bug 修不好時的心靈雞湯 | `tools/advice_tool.py`    |            |
 |      |                     | `tools/`    |            |
 |姚谷伝 | 休息時間冷知識| `tools/cat_fact_tool.py`|  https://catfact.ninja/fact      |
@@ -37,7 +41,7 @@
 ├── tools/
 │   ├── __init__.py
 │   ├── example_tool.py    # 範例（可刪除）
-│   ├── cat_fact_tool.py   # 姚谷伝 的 Tool
+│   ├── web_search_tool.py        # 林伽紜 的 Tool
 │   ├── xxx_tool.py        # 組員 B 的 Tool
 │   └── xxx_tool.py        # 組員 C 的 Tool
 ├── requirements.txt
@@ -85,18 +89,32 @@ python agent.py
 
 ## 各 Tool 說明
 
-### `get_cat_fact`（負責：姚谷伝）
+### `web_search_tool`（負責：林伽紜）
 
-- **功能**：呼叫 Cat Facts API，取得一則隨機的貓咪冷知識，供休息時間娛樂使用。
-- **使用 API**：`https://catfact.ninja/fact`
-- **參數**：無（不需傳遞參數）
-- **回傳範例**：`"Cats are the most popular pet in the United States: There are 88 million pet cats and 74 million dogs."`
+- **功能**：搜尋技術文件
+- **使用 API**：duckduckgo-search
+- **參數**：
+- **回傳範例**：
+🔍 搜尋結果：「Python FastAPI」
+
+1. FastAPI
+   連結: https://fastapi.tiangolo.com/
+   摘要: If anyone is looking to build a productionPythonAPI, I would highly recommendFastAPI. ...FastAPIapplications running under Uvicorn as one of the ...
+
+2. Python Types Intro - FastAPI
+   連結: https://fastapi.tiangolo.com/python-types/
+   摘要: The important thing is that by using standardPythontypes, in a single place (instead of adding more classes, decorators, etc),FastAPIwill do a ...
+
+3. multithreading - FastAPI python: How to run a thread in the
+   連結: https://stackoverflow.com/questions/70872276/fastapi-python-how-to-run-a-thread-in-the-background
+   摘要: I'm making a server inpythonusingFastAPI, and I want a function that is not related to my API, to run in the background every 5 minutes (like ...
 
 ```python
 @mcp.tool()
-def get_cat_fact() -> str:
-    """休息時間冷知識：呼叫 Cat Facts API，取得隨機貓咪冷知識。"""
-    ...
+def web_search(query: str) -> str:
+    """搜尋網路上的技術文件與資訊。
+    當使用者需要查詢最新的技術文件、程式碼解法或任何網路資訊時使用。"""
+    return search_web_data(query)
 ```
 
 ### `get_advice_tool`（負責：許瀞云）
@@ -120,11 +138,8 @@ def get_cat_fact() -> str:
 
 ### 遇到最難的問題
 
-最困難的是在將自己的 Tool 合併至 `server.py` 的時候，需要確保每個組員的 import 路徑和 function 命名都是獨立的（以免在合併 commit 時互相衝突）。
-解決方式：透過制定明確的分支開發流程（Git Feature Branch `feature/cat-fact`），並統一將邏輯保留在 `/tools` 目錄下各自專屬的檔案中，再於 `server.py` 共用註冊。
+> 遇到了外部 API 服務無預警掛掉與套件改版的問題。原本想串接的 numbersapi.com 剛好全球伺服器故障（全面回傳 404 Not Found），後來改為實作 duckduckgo-search 來獲取技術文件時，又遇到該套件剛發生重大更新，把內部模組名稱統一是 ddgs，導致原本的官方範例程式碼無法運作、默默回傳空陣列。解決方式： 透過終端機進行 Debug 測試找到報錯原因，將套件名稱與 Import 語法更新為最新的 from ddgs import DDGS，讓程式成功運作！
 
 ### MCP 跟上週的 Tool Calling 有什麼不同？
 
-1. **低耦合、模組化更高**：MCP 將工具打包成獨立的伺服器（Server），不再需要將每個工具的實作細節和套件相依性硬塞在主程式裡。
-2. **擴充更容易**：只要透過統一的協定連接 Server，AI Agent 可以隨時跨本地或網頁端動態地發現新工具（Tools, Resources, Prompts），省去繁瑣的硬整合操作。
-3. **可重複利用性極佳**：寫好一個 MCP Server 之後，其他不同的 AI 專案或應用都能直接橋接使用，跨專案的復用性非常高！
+> 把伺服器跟客戶端分開。我們可以把各種資料庫查詢、API 搜尋（像 DuckDuckGo）封裝成一個獨立的工具箱，不僅容易維護，安全性也更好。
