@@ -21,7 +21,7 @@
 
 | 姓名 | 負責功能            | 檔案          | 使用的 API |
 | ---- | ------------------- | ------------- | ---------- |
-| 林伽紜     |  搜尋技術文件   | `tools/web_search`    | duckduckgo-search |
+| 林伽紜     |  搜尋技術文件   | `tools/web_search_tool.py`    | duckduckgo-search |
 |      |                     | `tools/`    |            |
 |      |                     | `tools/`    |            |
 |      | Resource + Prompt   | `server.py` | —         |
