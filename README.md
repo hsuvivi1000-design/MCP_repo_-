@@ -12,8 +12,8 @@
 | Tool 名稱                 | 功能說明     | 負責組員 |
 | ------------------------- | ------------ | -------- |
 | （範例：`get_weather`） | 查詢即時天氣 |          |
-|                           |              |          |
-|                           |              |          |
+| `get_cat_fact_data`       | 休息時間冷知識 |     姚谷伝     |
+|`get_advice_tool`| bug 修不好時的心靈雞湯|    許瀞云      |
 
 ---
 
@@ -21,9 +21,9 @@
 
 | 姓名 | 負責功能            | 檔案          | 使用的 API |
 | ---- | ------------------- | ------------- | ---------- |
+| 許瀞云| bug 修不好時的心靈雞湯 | `tools/advice_tool.py`    |            |
 |      |                     | `tools/`    |            |
-|      |                     | `tools/`    |            |
-|      |                     | `tools/`    |            |
+|姚谷伝 | 休息時間冷知識| `tools/cat_fact_tool.py`|  https://catfact.ninja/fact      |
 |      | Resource + Prompt   | `server.py` | —         |
 |      | Agent（用 AI 產生） | `agent.py`  | Gemini API |
 
@@ -37,7 +37,7 @@
 ├── tools/
 │   ├── __init__.py
 │   ├── example_tool.py    # 範例（可刪除）
-│   ├── xxx_tool.py        # 組員 A 的 Tool
+│   ├── cat_fact_tool.py   # 姚谷伝 的 Tool
 │   ├── xxx_tool.py        # 組員 B 的 Tool
 │   └── xxx_tool.py        # 組員 C 的 Tool
 ├── requirements.txt
@@ -85,26 +85,27 @@ python agent.py
 
 ## 各 Tool 說明
 
-### `tool_name`（負責：姓名）
+### `get_cat_fact`（負責：姚谷伝）
 
-- **功能**：
-- **使用 API**：
-- **參數**：
-- **回傳範例**：
+- **功能**：呼叫 Cat Facts API，取得一則隨機的貓咪冷知識，供休息時間娛樂使用。
+- **使用 API**：`https://catfact.ninja/fact`
+- **參數**：無（不需傳遞參數）
+- **回傳範例**：`"Cats are the most popular pet in the United States: There are 88 million pet cats and 74 million dogs."`
 
 ```python
 @mcp.tool()
-def tool_name(param: str) -> str:
-    """Tool 的 docstring（這就是 AI 看到的描述）"""
+def get_cat_fact() -> str:
+    """休息時間冷知識：呼叫 Cat Facts API，取得隨機貓咪冷知識。"""
     ...
 ```
 
-### `tool_name`（負責：姓名）
+### `get_advice_tool`（負責：許瀞云）
 
-- **功能**：
-- **使用 API**：
+- **功能**：bug 修不好時的心靈雞湯
+- **使用 API**：https://api.adviceslip.com/advice
 - **參數**：
-- **回傳範例**：
+- **回傳範例**： `"Today, do not use the words "Kind of", "Sort of" or "Maybe". It either is or it isn't."`
+
 
 ### `tool_name`（負責：姓名）
 
@@ -119,8 +120,11 @@ def tool_name(param: str) -> str:
 
 ### 遇到最難的問題
 
-> 寫下這次實作遇到最困難的事，以及怎麼解決的
+最困難的是在將自己的 Tool 合併至 `server.py` 的時候，需要確保每個組員的 import 路徑和 function 命名都是獨立的（以免在合併 commit 時互相衝突）。
+解決方式：透過制定明確的分支開發流程（Git Feature Branch `feature/cat-fact`），並統一將邏輯保留在 `/tools` 目錄下各自專屬的檔案中，再於 `server.py` 共用註冊。
 
 ### MCP 跟上週的 Tool Calling 有什麼不同？
 
-> 用自己的話說說，做完後你覺得 MCP 的好處是什麼
+1. **低耦合、模組化更高**：MCP 將工具打包成獨立的伺服器（Server），不再需要將每個工具的實作細節和套件相依性硬塞在主程式裡。
+2. **擴充更容易**：只要透過統一的協定連接 Server，AI Agent 可以隨時跨本地或網頁端動態地發現新工具（Tools, Resources, Prompts），省去繁瑣的硬整合操作。
+3. **可重複利用性極佳**：寫好一個 MCP Server 之後，其他不同的 AI 專案或應用都能直接橋接使用，跨專案的復用性非常高！

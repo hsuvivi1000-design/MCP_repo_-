@@ -24,12 +24,26 @@ def get_advice() -> str:
     """提供心靈雞湯。
     當使用者 bug 修不好時，或者是感到挫折時使用。"""
     return get_advice_data()
+from tools.cat_fact_tool import get_cat_fact_data
+
+@mcp.tool()
+def get_cat_fact() -> str:
+    """休息時間冷知識：呼叫 Cat Facts API，取得隨機貓咪冷知識。"""
+    return get_cat_fact_data()
 
 
 @mcp.tool()
 def hello(name: str) -> str:
     """跟使用者打招呼。測試用，確認 MCP Server 正常運作。"""
     return f"你好，{name}！MCP Server 運作正常 🎉"
+
+from tools.activity_tool import get_random_activity
+
+@mcp.tool()
+def suggest_activity() -> str:
+    """取得一個隨機活動建議。
+    當使用者不知道要做什麼、覺得無聊，或者想站起來做點別的事情時使用。"""
+    return get_random_activity()
 
 
 # ════════════════════════════════
