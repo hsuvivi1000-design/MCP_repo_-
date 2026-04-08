@@ -13,7 +13,7 @@
 | ------------------------- | ------------ | -------- |
 | `web_search_tool` | 搜尋技術文件 |  林伽紜        |
 |                           |              |          |
-|                           |              |          |
+|  `get_joke`     |   獲得隨機冷笑話 | 朱覺祥  |
 | （範例：`get_weather`） | 查詢即時天氣 |          |
 | `get_cat_fact_data`       | 休息時間冷知識 |     姚谷伝     |
 |`get_advice_tool`| bug 修不好時的心靈雞湯|    許瀞云      |
@@ -26,7 +26,7 @@
 | ---- | ------------------- | ------------- | ---------- |
 | 林伽紜     |  搜尋技術文件   | `tools/web_search_tool.py`    | duckduckgo-search |
 | 許瀞云| bug 修不好時的心靈雞湯 | `tools/advice_tool.py`    |            |
-|      |                     | `tools/`    |            |
+| 朱覺祥 |  get_joke Tool   | `tools/joke_tool.py`    | icanhazdadjoke  |
 |姚谷伝 | 休息時間冷知識| `tools/cat_fact_tool.py`|  https://catfact.ninja/fact      |
 |      | Resource + Prompt   | `server.py` | —         |
 |      | Agent（用 AI 產生） | `agent.py`  | Gemini API |
@@ -42,7 +42,7 @@
 │   ├── __init__.py
 │   ├── example_tool.py    # 範例（可刪除）
 │   ├── web_search_tool.py        # 林伽紜 的 Tool
-│   ├── xxx_tool.py        # 組員 B 的 Tool
+│   ├── tools/advice_tool.py        # 朱覺祥 的 Tool
 │   └── xxx_tool.py        # 組員 C 的 Tool
 ├── requirements.txt
 ├── .env.example
@@ -125,12 +125,19 @@ def web_search(query: str) -> str:
 - **回傳範例**： `"Today, do not use the words "Kind of", "Sort of" or "Maybe". It either is or it isn't."`
 
 
-### `tool_name`（負責：姓名）
+### `get_joke`（負責：朱覺祥）
+**功能**：取得一則隨機英文笑話（Dad Joke），當使用者覺得累、心情不好時使用。
+- **使用 API**：`https://icanhazdadjoke.com/`
+- **參數**：無
+- **回傳範例**：`"Why couldn't the kid see the pirate movie? Because it was rated arrr!"`
 
-- **功能**：
-- **使用 API**：
-- **參數**：
-- **回傳範例**：
+```python
+@mcp.tool()
+def get_joke() -> str:
+    """取得一則隨機英文笑話（Dad Joke）。
+    當使用者覺得累、心情不好、或想聽笑話時使用。"""
+    return get_joke_data()
+```
 
 ---
 
