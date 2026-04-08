@@ -13,7 +13,7 @@
 | ------------------------- | ------------ | -------- |
 | （範例：`get_weather`） | 查詢即時天氣 |          |
 | `get_cat_fact_data`       | 休息時間冷知識 |     姚谷伝     |
-|                           |              |          |
+|`get_advice_tool`| bug 修不好時的心靈雞湯|    許瀞云      |
 
 ---
 
@@ -21,7 +21,7 @@
 
 | 姓名 | 負責功能            | 檔案          | 使用的 API |
 | ---- | ------------------- | ------------- | ---------- |
-|      |                     | `tools/`    |            |
+| 許瀞云| bug 修不好時的心靈雞湯 | `tools/advice_tool.py`    |            |
 |      |                     | `tools/`    |            |
 |姚谷伝 | 休息時間冷知識| `tools/cat_fact_tool.py`|  https://catfact.ninja/fact      |
 |      | Resource + Prompt   | `server.py` | —         |
@@ -99,12 +99,13 @@ def get_cat_fact() -> str:
     ...
 ```
 
-### `tool_name`（負責：姓名）
+### `get_advice_tool`（負責：許瀞云）
 
-- **功能**：
-- **使用 API**：
+- **功能**：bug 修不好時的心靈雞湯
+- **使用 API**：https://api.adviceslip.com/advice
 - **參數**：
-- **回傳範例**：
+- **回傳範例**： `"Today, do not use the words "Kind of", "Sort of" or "Maybe". It either is or it isn't."`
+
 
 ### `tool_name`（負責：姓名）
 

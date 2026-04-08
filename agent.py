@@ -1,38 +1,147 @@
-"""
-W8 分組實作：MCP Client + Gemini Agent
+import os
+import asyncio
+from dotenv import load_dotenv
 
-這個檔案用 AI 產生。請把以下設計指令貼給你的 AI 工具（Copilot / Antigravity），
-讓它幫你產生完整的程式碼：
+from google import genai
+from google.genai import types
 
-────────────────────────────────────────────
-設計指令（複製貼給 AI）：
-
-幫我寫一個 Python Agent，需求如下：
-
-1. 用 MCP SSE Client 連接到 http://localhost:8000/sse
-   （server.py 已在另一個終端機獨立執行）
-2. 連接後，自動取得 Server 提供的所有工具清單（list_tools）
-3. 把工具清單轉換成 Gemini API 的 function declaration 格式
-4. 使用 Gemini 2.0 Flash（免費版），進行多輪對話
-5. 當 Gemini 回傳 function_call 時：
-   - 透過 MCP call_tool 呼叫對應的 Tool
-   - 把結果送回 Gemini 繼續對話
-6. 當 Gemini 回傳文字時，直接顯示給使用者
-7. 需要的套件：google-genai、mcp、python-dotenv
-8. API Key 從 .env 的 GEMINI_API_KEY 讀取
-9. 用 asyncio 執行（因為 MCP Client 是非同步的）
-10. 加上 debug 輸出，顯示 Agent 呼叫了哪個工具和結果
-
-MCP SSE Client 的連接方式：
+from mcp import ClientSession
 from mcp.client.sse import sse_client
-async with sse_client("http://localhost:8000/sse") as (read, write):
-    ...
-────────────────────────────────────────────
 
-啟動方式：
-  終端機 1：python server.py   （先啟動 Server）
-  終端機 2：python agent.py    （再啟動 Agent）
-"""
+# 載入環境變數
+load_dotenv()
 
-# TODO：把上面的設計指令貼給 AI，用產生的程式碼取代這段
-print("請用 AI 產生這個檔案的程式碼。設計指令在檔案上方的註解中。")
+async def run_agent():
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or api_key == "你的_Gemini_API_Key":
+        print("❌ 未設定 GEMINI_API_KEY，請在 .env 檔案中填寫你的 Gemini API Key！")
+        return
+
+    # 初始化 Gemini 客戶端
+    client = genai.Client(api_key=api_key)
+
+    print("🔄 正在連接到 MCP Server (http://localhost:8000/sse)...")
+    try:
+        # 1. 連接到 MCP Server
+        async with sse_client("http://localhost:8000/sse") as (read_stream, write_stream):
+            async with ClientSession(read_stream, write_stream) as session:
+                await session.initialize()
+                print("✅ 成功連接到 MCP Server!")
+
+                # 2. 取得所有工具
+                tools_response = await session.list_tools()
+                available_tools = {tool.name: tool for tool in tools_response.tools}
+                print(f"🔧 伺服器提供以下工具: {list(available_tools.keys())}")
+
+                # 3. 轉換成 Gemini API 的 function declaration 格式
+                gemini_tools = []
+                for name, mcp_tool in available_tools.items():
+                    func_decl = {
+                        "name": mcp_tool.name,
+                        "description": mcp_tool.description or "",
+                    }
+                    
+                    if mcp_tool.inputSchema:
+                        properties = mcp_tool.inputSchema.get("properties", {})
+                        required = mcp_tool.inputSchema.get("required", [])
+                        # 簡單的映射以符合 Gemini 規範
+                        schema = {
+                            "type": "OBJECT",
+                            "properties": {
+                                k: {"type": v.get("type", "STRING").upper()} 
+                                for k, v in properties.items()
+                            }
+                        }
+                        if required:
+                            schema["required"] = required
+                        func_decl["parameters"] = schema
+
+                    gemini_tools.append(func_decl)
+
+                tools_config = None
+                if gemini_tools:
+                    tools_config = [{"function_declarations": gemini_tools}]
+
+                # 4. 開始多輪對話
+                print("\n🤖 Gemini 2.5 Flash-Lite Agent 啟動！")
+                print("💡 現在你可以跟 AI 對話了，AI 會自動評估是否呼叫對應的 Tool 來幫助你。（輸入 'quit' 退出）")
+                print("-" * 50)
+                
+                chat = client.chats.create(model="gemini-2.5-flash-lite")
+                
+                while True:
+                    user_input = input("你: ")
+                    if user_input.lower() in ["quit", "exit"]:
+                        print("👋 再見！")
+                        break
+
+                    response = chat.send_message(user_input, config=types.GenerateContentConfig(tools=tools_config))
+                    
+                    # 處理 possible function calls
+                    while True:
+                        has_function_call = False
+                        
+                        if response.candidates and response.candidates[0].content.parts:
+                            for part in response.candidates[0].content.parts:
+                                if part.function_call:
+                                    has_function_call = True
+                                    fn_call = part.function_call
+                                    # 轉換 args 屬性（因為 Gemini 回傳可能是不同結構）
+                                    # args 若有，轉換為 dict 傳給 MCP
+                                    call_args = {k: v for k, v in fn_call.args.items()} if fn_call.args else {}
+                                    
+                                    print(f"\n  [Debug] 🛠️ Agent 決定呼叫工具: {fn_call.name}，參數: {call_args}")
+                                    
+                                    # 5. 透過 MCP call_tool 呼叫對應的 Tool
+                                    try:
+                                        tool_result = await session.call_tool(
+                                            fn_call.name, 
+                                            arguments=call_args
+                                        )
+                                        # 解析 MCP 的 Content (如果有)
+                                        # 大多時候是 text 類型的結構
+                                        text_result = ""
+                                        for content in tool_result.content:
+                                            # mcp tool 回傳可能是 dict 或對象
+                                            if hasattr(content, 'type') and content.type == "text":
+                                                text_result += content.text + "\n"
+                                            elif hasattr(content, 'text'):
+                                                text_result += content.text + "\n"
+                                            else:
+                                                text_result += str(content) + "\n"
+                                                
+                                        print(f"  [Debug] 📥 工具執行結果: {text_result.strip()}")
+                                        
+                                        # 把結果送回 Gemini 繼續對話
+                                        response = chat.send_message(
+                                            types.Part.from_function_response(
+                                                name=fn_call.name,
+                                                response={"result": text_result}
+                                            ),
+                                            config=types.GenerateContentConfig(tools=tools_config)
+                                        )
+                                    except Exception as e:
+                                        print(f"  [Error] ❌ 執行工具失敗: {e}")
+                                        response = chat.send_message(
+                                            types.Part.from_function_response(
+                                                name=fn_call.name,
+                                                response={"error": str(e)}
+                                            ),
+                                            config=types.GenerateContentConfig(tools=tools_config)
+                                        )
+                        
+                        if not has_function_call:
+                            break # 如果沒有更多 function call 則結束此輪回圈
+
+                    # 6. 直接顯示文字結果給使用者
+                    print(f"AI: {response.text}\n")
+
+    except Exception as e:
+        print(f"❌ 無法連接到 Server，請確認已經先執行了 `python server.py`！\n錯誤詳細資料: {e}")
+
+if __name__ == "__main__":
+    # Windows 環境如果有 proactor 問題，可加上此行確保 asyncio 關閉順利
+    if os.name == 'nt':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        
+    asyncio.run(run_agent())
