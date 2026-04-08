@@ -17,6 +17,13 @@ mcp = FastMCP("第X組-server")
 #  Tools：各組員各自負責一個 Tool
 # ════════════════════════════════
 
+from tools.advice_tool import get_advice_data
+
+@mcp.tool()
+def get_advice() -> str:
+    """提供心靈雞湯。
+    當使用者 bug 修不好時，或者是感到挫折時使用。"""
+    return get_advice_data()
 from tools.cat_fact_tool import get_cat_fact_data
 
 @mcp.tool()
