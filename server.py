@@ -32,6 +32,14 @@ def hello(name: str) -> str:
     """跟使用者打招呼。測試用，確認 MCP Server 正常運作。"""
     return f"你好，{name}！MCP Server 運作正常 🎉"
 
+from tools.activity_tool import get_random_activity
+
+@mcp.tool()
+def suggest_activity() -> str:
+    """取得一個隨機活動建議。
+    當使用者不知道要做什麼、覺得無聊，或者想站起來做點別的事情時使用。"""
+    return get_random_activity()
+
 
 # ════════════════════════════════
 #  Resource：提供靜態參考資料
