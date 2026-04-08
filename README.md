@@ -23,7 +23,7 @@
 | ---- | ------------------- | ------------- | ---------- |
 | 林伽紜     |  搜尋技術文件   | `tools/web_search_tool.py`    | duckduckgo-search |
 |      |                     | `tools/`    |            |
-|      |                     | `tools/`    |            |
+|姚谷伝 | 休息時間冷知識| `tools/cat_fact_tool.py`|  https://catfact.ninja/fact      |
 |      | Resource + Prompt   | `server.py` | —         |
 |      | Agent（用 AI 產生） | `agent.py`  | Gemini API |
 

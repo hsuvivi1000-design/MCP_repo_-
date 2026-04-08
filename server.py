@@ -17,14 +17,12 @@ mcp = FastMCP("第6組-server")
 #  Tools：各組員各自負責一個 Tool
 # ════════════════════════════════
 
-# 範例（替換成你們自己的 Tool）：
-# from tools.weather_tool import get_weather_data
-#
-# @mcp.tool()
-# def get_weather(city: str) -> str:
-#     """取得指定城市的即時天氣資訊。
-#     當使用者詢問天氣、溫度、是否該帶傘時使用。"""
-#     return get_weather_data(city)
+from tools.cat_fact_tool import get_cat_fact_data
+
+@mcp.tool()
+def get_cat_fact() -> str:
+    """休息時間冷知識：呼叫 Cat Facts API，取得隨機貓咪冷知識。"""
+    return get_cat_fact_data()
 
 from tools.web_search_tool import search_web_data
 
@@ -32,6 +30,14 @@ from tools.web_search_tool import search_web_data
 def hello(name: str) -> str:
     """跟使用者打招呼。測試用，確認 MCP Server 正常運作。"""
     return f"你好，{name}！MCP Server 運作正常 🎉"
+
+from tools.activity_tool import get_random_activity
+
+@mcp.tool()
+def suggest_activity() -> str:
+    """取得一個隨機活動建議。
+    當使用者不知道要做什麼、覺得無聊，或者想站起來做點別的事情時使用。"""
+    return get_random_activity()
 
 
 @mcp.tool()
