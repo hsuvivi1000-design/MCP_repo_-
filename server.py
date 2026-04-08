@@ -1,6 +1,6 @@
 """
 W8 分組實作：MCP Server
-主題：（填入你們選的主題）
+主題：開發者工具箱 MCP Server
 
 分工說明：
 - 各組員在 tools/ 建立自己的 Tool，import 到這裡用 @mcp.tool() 註冊
@@ -10,7 +10,7 @@ W8 分組實作：MCP Server
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("第X組-server")
+mcp = FastMCP("第6組-server")
 
 
 # ════════════════════════════════
@@ -26,11 +26,19 @@ mcp = FastMCP("第X組-server")
 #     當使用者詢問天氣、溫度、是否該帶傘時使用。"""
 #     return get_weather_data(city)
 
+from tools.web_search_tool import search_web_data
 
 @mcp.tool()
 def hello(name: str) -> str:
     """跟使用者打招呼。測試用，確認 MCP Server 正常運作。"""
     return f"你好，{name}！MCP Server 運作正常 🎉"
+
+
+@mcp.tool()
+def web_search(query: str) -> str:
+    """搜尋網路上的技術文件與資訊。
+    當使用者需要查詢最新的技術文件、程式碼解法或任何網路資訊時使用。"""
+    return search_web_data(query)
 
 
 # ════════════════════════════════
