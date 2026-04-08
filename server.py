@@ -26,6 +26,15 @@ mcp = FastMCP("第X組-server")
 #     當使用者詢問天氣、溫度、是否該帶傘時使用。"""
 #     return get_weather_data(city)
 
+from tools.joke_tool import get_joke_data
+
+
+@mcp.tool()
+def get_joke() -> str:
+    """取得一則隨機英文笑話（Dad Joke）。
+    當使用者覺得累、心情不好、或想聽笑話時使用。"""
+    return get_joke_data()
+
 
 @mcp.tool()
 def hello(name: str) -> str:
