@@ -1,6 +1,7 @@
 """
 W8 分組實作：MCP Server
 主題：B：開發者工具箱
+主題：開發者工具箱 MCP Server
 
 分工說明：
 - 各組員在 tools/ 建立自己的 Tool，import 到這裡用 @mcp.tool() 註冊
@@ -10,7 +11,7 @@ W8 分組實作：MCP Server
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("第X組-server")
+mcp = FastMCP("第6組-server")
 
 
 # ════════════════════════════════
@@ -31,6 +32,7 @@ def get_cat_fact() -> str:
     """休息時間冷知識：呼叫 Cat Facts API，取得隨機貓咪冷知識。"""
     return get_cat_fact_data()
 
+from tools.web_search_tool import search_web_data
 
 @mcp.tool()
 def hello(name: str) -> str:
@@ -44,6 +46,13 @@ def suggest_activity() -> str:
     """取得一個隨機活動建議。
     當使用者不知道要做什麼、覺得無聊，或者想站起來做點別的事情時使用。"""
     return get_random_activity()
+
+
+@mcp.tool()
+def web_search(query: str) -> str:
+    """搜尋網路上的技術文件與資訊。
+    當使用者需要查詢最新的技術文件、程式碼解法或任何網路資訊時使用。"""
+    return search_web_data(query)
 
 
 # ════════════════════════════════
