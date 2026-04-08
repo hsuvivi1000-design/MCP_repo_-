@@ -11,7 +11,7 @@
 
 | Tool 名稱                 | 功能說明     | 負責組員 |
 | ------------------------- | ------------ | -------- |
-| web_search | 搜尋技術文件 |  林伽紜        |
+| `web_search_tool` | 搜尋技術文件 |  林伽紜        |
 |                           |              |          |
 |                           |              |          |
 | （範例：`get_weather`） | 查詢即時天氣 |          |
@@ -41,7 +41,7 @@
 ├── tools/
 │   ├── __init__.py
 │   ├── example_tool.py    # 範例（可刪除）
-│   ├── web_search_tool.py        # 組員 A 的 Tool
+│   ├── web_search_tool.py        # 林伽紜 的 Tool
 │   ├── xxx_tool.py        # 組員 B 的 Tool
 │   └── xxx_tool.py        # 組員 C 的 Tool
 ├── requirements.txt
