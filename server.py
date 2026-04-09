@@ -1,5 +1,6 @@
 """
 W8 分組實作：MCP Server
+主題：B：開發者工具箱
 主題：開發者工具箱 MCP Server
 
 分工說明：
@@ -59,17 +60,20 @@ def web_search(query: str) -> str:
 #  URI 格式：info://名稱 或 docs://名稱
 # ════════════════════════════════
 
-# 範例（替換成符合你們主題的內容）：
-#
-# @mcp.resource("info://tips")
-# def get_tips() -> str:
-#     """（主題）的實用小提示"""
-#     return (
-#         "實用小提示：\n"
-#         "- 提示 1\n"
-#         "- 提示 2\n"
-#         "- 提示 3"
-#     )
+@mcp.resource("docs://shortcuts")
+def get_shortcuts() -> str:
+    """常用開發快捷鍵與指令速查表"""
+    return (
+        "VS Code 快捷鍵：\n"
+        "- Ctrl+P / Cmd+P：快速開檔\n"
+        "- Ctrl+Shift+P：指令面板\n"
+        "- Alt+Click：多重游標\n\n"
+        "Git 常用指令：\n"
+        "- git status：查看狀態\n"
+        "- git add . ：加入所有變更\n"
+        "- git commit -m 'msg'：提交\n"
+        "- git push：推送"
+    )
 
 
 # ════════════════════════════════
@@ -77,18 +81,16 @@ def web_search(query: str) -> str:
 #  使用者透過 /use <名稱> [參數] 呼叫
 # ════════════════════════════════
 
-# 範例（替換成符合你們主題的內容）：
-#
-# @mcp.prompt()
-# def my_plan(topic: str) -> str:
-#     """產生（主題）計畫的提示詞"""
-#     return (
-#         f"請幫我規劃關於 {topic} 的計畫：\n"
-#         f"1. 先使用相關工具取得資訊\n"
-#         f"2. 根據資訊提供 3 個具體建議\n"
-#         f"3. 附上一則笑話或建議讓我開心\n"
-#         f"請用繁體中文回答。"
-#     )
+@mcp.prompt()
+def debug_break() -> str:
+    """當 code 除錯除到崩潰時的放鬆提示詞"""
+    return (
+        "我剛剛一直在除錯，需要放鬆一下。請幫我：\n"
+        "1. 說一個讓我笑的笑話\n"
+        "2. 給我一則激勵繼續寫 code 的人生建議\n"
+        "3. 建議一個讓我起身活動 5 分鐘的活動\n"
+        "請用輕鬆幽默的語氣。"
+    )
 
 
 if __name__ == "__main__":
