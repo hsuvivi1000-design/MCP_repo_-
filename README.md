@@ -1,7 +1,7 @@
 # MCP Server + AI agent 分組實作
 
 > 課程：AI Agent 開發 — MCP（Model Context Protocol）
-> 主題：（填入你們選的主題）
+> 主題：開發者工具箱 MCP Server
 
 ---
 
@@ -12,9 +12,8 @@
 | Tool 名稱                 | 功能說明     | 負責組員 |
 | ------------------------- | ------------ | -------- |
 | `web_search_tool` | 搜尋技術文件 |  林伽紜        |
-|                           |              |          |
 |  `get_joke`     |   獲得隨機冷笑話 | 朱覺祥  |
-| （範例：`get_weather`） | 查詢即時天氣 |          |
+| `activity_tool` | 獲得隨機活動建議 | 林湘紜 |
 | `get_cat_fact_data`       | 休息時間冷知識 |     姚谷伝     |
 |`get_advice_tool`| bug 修不好時的心靈雞湯|    許瀞云      |
 
@@ -28,6 +27,7 @@
 | 許瀞云| bug 修不好時的心靈雞湯 | `tools/advice_tool.py`    |            |
 | 朱覺祥 |  get_joke Tool   | `tools/joke_tool.py`    | icanhazdadjoke  |
 |姚谷伝 | 休息時間冷知識| `tools/cat_fact_tool.py`|  https://catfact.ninja/fact      |
+|林湘紜 | 獲得隨機活動建議| `tools/activity_tool.py`|  bored-api  |
 |      | Resource + Prompt   | `server.py` | —         |
 |      | Agent（用 AI 產生） | `agent.py`  | Gemini API |
 
@@ -43,7 +43,7 @@
 │   ├── example_tool.py    # 範例（可刪除）
 │   ├── web_search_tool.py        # 林伽紜 的 Tool
 │   ├── tools/advice_tool.py        # 朱覺祥 的 Tool
-│   └── xxx_tool.py        # 組員 C 的 Tool
+│   └── activity_tool.py        # 林湘紜 的 Tool
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -80,10 +80,16 @@ python agent.py
 ### MCP Inspector 截圖
 
 > 貼上 Inspector 的截圖（Tools / Resources / Prompts 三個分頁都要有）
+<img width="1917" height="866" alt="螢幕擷取畫面 2026-04-10 132246" src="https://github.com/user-attachments/assets/a64c61a7-e4b8-4f6b-85e3-b5526a38707c" />
+<img width="1919" height="860" alt="螢幕擷取畫面 2026-04-10 132326" src="https://github.com/user-attachments/assets/7bd1e800-cd3b-404e-a4f6-4bac9685b75e" />
+<img width="1919" height="867" alt="螢幕擷取畫面 2026-04-10 132405" src="https://github.com/user-attachments/assets/e5dc6ff9-1de7-484d-a944-03b63278a0b6" />
+
 
 ### Agent 對話截圖
 
 > 貼上 Agent 對話的截圖（顯示 Gemini 呼叫 Tool 的過程，以及使用 /use 呼叫 Prompt 的結果）
+<img width="952" height="374" alt="螢幕擷取畫面 2026-04-10 133314" src="https://github.com/user-attachments/assets/c0e4f708-3307-4fbb-b04f-d2b2fe631a35" />
+<img width="950" height="530" alt="螢幕擷取畫面 2026-04-10 133625" src="https://github.com/user-attachments/assets/bee44160-1632-4932-b9d5-327e0845ecb2" />
 
 ---
 
@@ -137,6 +143,21 @@ def get_joke() -> str:
     """取得一則隨機英文笑話（Dad Joke）。
     當使用者覺得累、心情不好、或想聽笑話時使用。"""
     return get_joke_data()
+```
+
+### `activity_tool`（負責：林湘紜）
+**功能**：獲得隨機活動建議。
+- **使用 API**：`https://bored-api.appbrewery.com/random`
+- **參數**：無
+- **回傳範例**：`建議活動：Learn about a distributed version control system such as Git
+活動類型：education`
+
+```python
+@mcp.tool()
+def suggest_activity() -> str:
+    """取得一個隨機活動建議。
+    當使用者不知道要做什麼、覺得無聊，或者想站起來做點別的事情時使用。"""
+    return get_random_activity()
 ```
 
 ---
