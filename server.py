@@ -20,6 +20,15 @@ mcp = FastMCP("第6組-server")
 
 from tools.advice_tool import get_advice_data
 
+from tools.joke_tool import get_joke_data
+
+
+@mcp.tool()
+def get_joke() -> str:
+    """取得一則隨機英文笑話（Dad Joke）。
+    當使用者覺得累、心情不好、或想聽笑話時使用。"""
+    return get_joke_data()
+
 @mcp.tool()
 def get_advice() -> str:
     """提供心靈雞湯。
