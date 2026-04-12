@@ -24,12 +24,12 @@
 | 姓名 | 負責功能            | 檔案          | 使用的 API |
 | ---- | ------------------- | ------------- | ---------- |
 | 林伽紜     |  搜尋技術文件   | `tools/web_search_tool.py`    | duckduckgo-search |
-| 許瀞云| bug 修不好時的心靈雞湯 | `tools/advice_tool.py`    |            |
+| 許瀞云| bug 修不好時的心靈雞湯 | `tools/advice_tool.py`    | https://api.adviceslip.com/advice|
 | 朱覺祥 |  get_joke Tool   | `tools/joke_tool.py`    | icanhazdadjoke  |
 |姚谷伝 | 休息時間冷知識| `tools/cat_fact_tool.py`|  https://catfact.ninja/fact      |
 |林湘紜 | 獲得隨機活動建議| `tools/activity_tool.py`|  bored-api  |
-|      | Resource + Prompt   | `server.py` | —         |
-|      | Agent（用 AI 產生） | `agent.py`  | Gemini API |
+|許瀞云| Resource + Prompt   | `server.py` | —         |
+|許瀞云| Agent（用 AI 產生） | `agent.py`  | Gemini API |
 
 ---
 
