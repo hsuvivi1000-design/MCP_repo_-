@@ -4,7 +4,7 @@ Tool：搜尋技術文件 (Web Search)
 使用 duckduckgo-search 來搜尋網路上的技術文件並回傳摘要結果。
 """
 
-from ddgs import DDGS
+from duckduckgo_search import DDGS
 
 # Tool 資訊（給人看的，不影響 MCP）
 TOOL_INFO = {

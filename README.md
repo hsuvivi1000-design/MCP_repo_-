@@ -44,6 +44,8 @@
 │   ├── web_search_tool.py        # 林伽紜 的 Tool
 │   ├── tools/advice_tool.py        # 朱覺祥 的 Tool
 │   └── activity_tool.py        # 林湘紜 的 Tool
+│   └── cat_fact_tool.py        # 姚谷伝 的 Tool
+│   └── get_advice_tool        # 許瀞云 的 Tool
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -126,10 +128,31 @@ def web_search(query: str) -> str:
 ### `get_advice_tool`（負責：許瀞云）
 
 - **功能**：bug 修不好時的心靈雞湯
-- **使用 API**：https://api.adviceslip.com/advice
-- **參數**：
+- **使用 API**：`https://api.adviceslip.com/advice`
+- **參數**：無
 - **回傳範例**： `"Today, do not use the words "Kind of", "Sort of" or "Maybe". It either is or it isn't."`
 
+```python
+@mcp.tool()
+def get_advice() -> str:
+    """提供心靈雞湯。
+    當使用者 bug 修不好時，或者是感到挫折時使用。"""
+    return get_advice_data()
+```
+
+### `get_cat_fact_data`（負責：姚谷伝）
+
+- **功能**：休息時間冷知識，取得隨機貓咪冷知識。
+- **使用 API**：`https://catfact.ninja/fact`
+- **參數**：無
+- **回傳範例**：`"Cats have 32 muscles that control the outer ear (compared to human's 6 muscles each)."`
+
+```python
+@mcp.tool()
+def get_cat_fact() -> str:
+    """休息時間冷知識：呼叫 Cat Facts API，取得隨機貓咪冷知識。"""
+    return get_cat_fact_data()
+```
 
 ### `get_joke`（負責：朱覺祥）
 **功能**：取得一則隨機英文笑話（Dad Joke），當使用者覺得累、心情不好時使用。
