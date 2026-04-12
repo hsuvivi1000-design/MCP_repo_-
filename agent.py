@@ -65,16 +65,67 @@ async def run_agent():
                 # 4. 開始多輪對話
                 print("\n🤖 Gemini 2.5 Flash-Lite Agent 啟動！")
                 print("💡 現在你可以跟 AI 對話了，AI 會自動評估是否呼叫對應的 Tool 來幫助你。（輸入 'quit' 退出）")
+                print("📝 特別指令:")
+                print("  /prompts: 顯示伺服器可使用的全部提示詞")
+                print("  /use <prompt_name> [args...]: 呼叫指定的提示詞 (例如: /use plan_trip Taipei)")
                 print("-" * 50)
                 
                 chat = client.chats.create(model="gemini-2.5-flash-lite")
                 
                 while True:
-                    user_input = input("你: ")
+                    user_input = input("你: ").strip()
+                    if not user_input:
+                        continue
                     if user_input.lower() in ["quit", "exit"]:
                         print("👋 再見！")
                         break
 
+                    # 處理 /prompts 指令
+                    if user_input.startswith("/prompts"):
+                        prompts_res = await session.list_prompts()
+                        print("📋 伺服器提供的 Prompts:")
+                        for p in prompts_res.prompts:
+                            args_desc = [f"{arg.name}" for arg in (p.arguments or [])]
+                            print(f"  - {p.name} ({', '.join(args_desc)}): {p.description}")
+                        continue
+                    
+                    # 處理 /use 指令
+                    if user_input.startswith("/use "):
+                        parts = user_input.split(" ")
+                        prompt_name = parts[1]
+                        args_values = parts[2:]
+                        
+                        prompts_res = await session.list_prompts()
+                        target_prompt = next((p for p in prompts_res.prompts if p.name == prompt_name), None)
+                        
+                        if not target_prompt:
+                            print(f"❌ 找不到 Prompt: {prompt_name}")
+                            continue
+                            
+                        args_dict = {}
+                        if target_prompt.arguments:
+                            for i, arg in enumerate(target_prompt.arguments):
+                                if i < len(args_values):
+                                    args_dict[arg.name] = args_values[i]
+                                elif arg.required:
+                                    args_dict[arg.name] = "未提供"
+                        
+                        try:
+                            get_prompt_res = await session.get_prompt(prompt_name, arguments=args_dict)
+                            # 讀取 prompt 內容
+                            prompt_text = ""
+                            for message in get_prompt_res.messages:
+                                if message.content.type == "text":
+                                    prompt_text += message.content.text + "\n"
+                            
+                            print(f"\n🔄 使用 Prompt 產生輸入:\n{prompt_text}")
+                            # 強制加上提示，確保輕量級模型不會只聊天不呼叫工具
+                            user_input = prompt_text + "\n(請直接呼叫工具取得資訊，不要指派我等候！)"
+                        except Exception as e:
+                            print(f"❌ 取得 Prompt 失敗: {e}")
+                            continue
+
+                    # 送出訊息至 Gemini
                     response = chat.send_message(user_input, config=types.GenerateContentConfig(tools=tools_config))
                     
                     # 處理 possible function calls
